@@ -6,6 +6,8 @@ github.com/akavel/rsrc/coff
 github.com/akavel/rsrc/ico
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/ev3go/ev3dev v0.0.0-20201120201234-8dac9dc96a47
+github.com/ev3go/ev3dev/fb
 # github.com/fsnotify/fsnotify v1.4.9
 github.com/fsnotify/fsnotify
 # github.com/fyne-io/mobile v0.1.2
