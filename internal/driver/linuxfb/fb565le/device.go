@@ -5,6 +5,13 @@ package fb565le
 // Alternatives:
 // - https://github.com/NeowayLabs/drm (DRM)
 // - https://github.com/gen2brain/framebuffer (fbdev)
+//
+// FB must be configured prior to use:
+//
+// ```
+// fbset -fb /dev/fb0 -xres 1024 -yres 768 -vxres 1024 -vyres 768 -depth 16
+// ```
+
 import (
 	"encoding/binary"
 	"errors"
@@ -15,19 +22,7 @@ import (
 	"os"
 	"syscall"
 
-	//	"periph.io/x/periph/conn/display"
-
 	"github.com/ev3go/ev3dev/fb"
-)
-
-// 128x128 (PLT-200A)
-// 320x256 (PLT-300A 1/4)
-// 640x512 (PLT-300A 1/4)
-// 1280x1024 (PLT-300A native)
-
-const (
-	displayWidth  = 640
-	displayHeight = 512
 )
 
 // Open expects a framebuffer device as its argument (such as "/dev/fb0"). The
@@ -48,15 +43,14 @@ func Open(device string) (*Device, error) {
 	if err != nil {
 		return nil, err
 	}
-	varInfo.bits_per_pixel = 16
-	varInfo.xres = displayWidth
-	varInfo.yres = displayHeight
-	varInfo.xres_virtual = displayWidth
-	varInfo.yres_virtual = displayHeight
-	varInfo, err = updateVarScreenInfo(file, varInfo)
-	if err != nil {
-		return nil, err
+
+	w := varInfo.xres_virtual
+	h := varInfo.yres_virtual
+
+	if varInfo.bits_per_pixel != 16 {
+		return nil, errors.New("unsupported bit depth")
 	}
+
 	fixInfo, err := getFixScreenInfo(file)
 	if err != nil {
 		return nil, err
@@ -83,7 +77,7 @@ func Open(device string) (*Device, error) {
 		file,
 		pixels,
 		int(fixInfo.line_length),
-		image.Rect(0, 0, displayWidth, displayHeight),
+		image.Rect(0, 0, int(w), int(h)),
 		fb.RGB565Model,
 	}, nil
 }
