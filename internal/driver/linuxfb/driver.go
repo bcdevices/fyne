@@ -11,7 +11,6 @@ import (
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/internal/driver"
-	"fyne.io/fyne/internal/driver/linuxfb/fb565le"
 	"fyne.io/fyne/internal/painter"
 	"fyne.io/fyne/internal/painter/software"
 
@@ -26,8 +25,13 @@ type SoftwarePainter interface {
 	Paint(fyne.Canvas) image.Image
 }
 
+type FBDevIface interface {
+	image.Image
+	Draw(r image.Rectangle, src image.Image, sp image.Point) error
+}
+
 type fbDriver struct {
-	fbDev        *fb565le.Device
+	fbDev        FBDevIface
 	device       *device
 	painter      SoftwarePainter
 	windows      []fyne.Window

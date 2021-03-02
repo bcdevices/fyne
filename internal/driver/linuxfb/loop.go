@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"fyne.io/fyne"
+	"fyne.io/fyne/internal/driver/linuxfb/fb32bpp"
 	"fyne.io/fyne/internal/driver/linuxfb/fb565le"
 	"fyne.io/fyne/internal/painter"
 )
@@ -63,9 +64,13 @@ func runOnDraw(w *fbWindow, f func()) {
 }
 
 func (d *fbDriver) initFB() {
+	var fbDev FBDevIface
 	fbDev, err := fb565le.Open("/dev/fb0")
 	if err != nil {
-		panic(err)
+		fbDev, err = fb32bpp.Open("/dev/fb0")
+		if err != nil {
+			panic(err)
+		}
 	}
 	d.fbDev = fbDev
 	initOnce.Do(func() {
